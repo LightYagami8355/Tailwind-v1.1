@@ -3,127 +3,275 @@
 <head>
     <title>Profile</title>
     <style>
+        /* --- CSS 樣式定義 --- */
+        :root {
+            --color-primary: #800080;
+            --color-discord: #5865f2;
+            --color-info: #00bfff;
+            --color-bg-light: rgba(255, 255, 255, 0.9);
+            --color-bg-dark: rgba(0, 0, 0, 0.6);
+        }
+        
         body {
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             background-image: url('images/background.jpg');
             background-size: cover;
             background-position: center;
+            padding: 40px 20px;
         }
 
-        .container {
-            width: 400px;
+        /* --- 左右分欄佈局 --- */
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .left-column {
+            flex: 1;
+            max-width: 400px;
             text-align: center;
         }
 
+        .right-column {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- 卡片與美化 --- */
+        .card {
+            padding: 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        /* --- 點擊展開/收合 (Accordion) 相關樣式 --- */
+        .accordion-header {
+            color: var(--color-primary); 
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 5px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-align: left;
+            cursor: pointer; /* 讓標題看起來可以點擊 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s;
+        }
+        .accordion-header:hover {
+            color: var(--color-discord);
+        }
+        .accordion-header::after {
+            content: '+'; /* 預設顯示加號 */
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+        .accordion-header.active::after {
+            content: '−'; /* 展開時顯示減號 */
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            /* 這是實現滑動特效的關鍵 CSS 屬性 */
+            overflow: hidden; 
+            max-height: 0; /* 預設收合 */
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* 平滑過渡 */
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .accordion-content.open {
+            max-height: 500px; /* 展開時設定一個足夠大的值 */
+            padding-top: 5px;
+            padding-bottom: 10px;
+        }
+        /* --- Accordion 結束 --- */
+
+        /* 繼承自上一個版本的其他樣式... */
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             overflow: hidden;
-            margin: 20px auto;
+            margin: 0 auto 15px;
+            border: 4px solid var(--color-discord);
         }
-
         .avatar img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
         }
-
-        h2 {
-            color: rgb(255, 255, 255);
-        }
-
-        s {
-            color: #000000;
-            background-color: rgb(0, 255, 247);
-            text-decoration: none;
-            border-radius: 5px;
+        .name {
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
             margin-bottom: 5px;
         }
-
-        p {
-            color: rgb(0, 128, 255);
-        }
-
-        .info {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
+        .status {
+            color: white;
+            background-color: var(--color-primary);
+            padding: 5px 10px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
             margin-bottom: 20px;
+        }
+        .info {
+            background-color: var(--color-bg-light);
+        }
+        .info p {
+            color: #333;
+            line-height: 1.6;
+            text-align: left;
         }
         .discord-profile {
-            background-color: rgba(248, 0, 207, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            background-color: var(--color-bg-light); 
         }
-
         .discord-profile h3 {
-            margin-bottom: 10px;
+            color: var(--color-discord);
+            border-bottom: 2px solid var(--color-discord);
         }
-
-        .discord-profile img {
-            overflow: hidden;
-            margin: 5px;
+        .image-wrapper {
+            text-align: center;
+            margin-top: 15px;
         }
-
+        .discord-avatar {
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+        }
+        .discord-avatar.bot-img {
+            max-width: 250px;
+        }
+        .discord-avatar:hover {
+            transform: scale(1.05);
+        }
         .social {
-            background-color: rgba(123, 63, 192, 0.8);
-            padding: 20px;
-            border-radius: 10px;
+            background-color: var(--color-bg-dark);
+            text-align: center;
         }
-
+        .social h3 {
+            color: white;
+            border-bottom-color: white;
+            text-align: center;
+        }
         .social a {
             display: inline-block;
-            margin: 10px;
+            margin: 10px 15px;
             color: white;
             text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .social a:hover {
+            background-color: white;
+            color: var(--color-primary);
+        }
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .left-column, .right-column {
+                max-width: 100%;
+            }
+            body {
+                padding: 20px 10px;
+            }
+            .discord-avatar {
+                max-width: 200px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="avatar">
-            <img src="images/photo.png" alt="photo">
-        </div>
-        <h2 class = "name">王鼎普 WANG,DING-PU</h2>
-        <s>Looking for part-time opportunities</s>
-        <div class="info">
-            <h3>about me</h3>
-            <p>2005.01.04(20)</p>
-            <p>From the Republic of China (Taiwan)</p>
-            <p>Want to be a part-time web front-end engineer</p>
-            <p>Possess C++, Python, and HTML capabilities</p>
-            <p>Improve English skills at the same time</p>
-        </div>
-        <div class="discord-profile">
-            <h3>Discord Active Developer Badge</h3>
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <a href="discord://user/855114225445109760" target="_blank">
-                    <img src="images/self.png" alt="My Discord Proflie" width="200" height="200" class="discord-avatar">
-                </a>
+    <div class="main-layout">
+        
+        <div class="left-column">
+            <div class="avatar">
+                <img src="images/photo.png" alt="photo">
             </div>
-            <p style="text-align: center; margin-top: 10px;"></p>
-        </div>
-        <div class="discord-profile">
-            <h3>My Discord BOT</h3>
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <a href="discord://user/855114225445109760" target="_blank">
-                    <img src="images/bot.png" alt="My Discord BOT" width="200" height="140" class="discord-avatar">
-                </a>
+            <h2 class="name">王鼎普 WANG,DING-PU</h2>
+            <s class="status">Looking for part-time opportunities</s>
+
+            <div class="info card">
+                <h3 class="accordion-header">ABOUT ME</h3>
+                
+                <div class="accordion-content">
+                    <p>2005.01.04 (20)</p>
+                    <p>From the Republic of China (Taiwan)</p>
+                    <p>Want to be a part-time web front-end engineer</p>
+                    <p>Possess C++, Python, and HTML capabilities</p>
+                    <p>Improve English skills at the same time</p>
+                </div>
             </div>
-            <p style="text-align: center; margin-top: 10px;"></p>
+
+            <div class="social card">
+                <h3 style="text-align: center;">CONTACT</h3>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=940104ryan484442903@gmail.com" target="_blank">Gmail</a>
+                <a href="https://github.com/LightYagami8355/Tailwind-v1.1" target="_blank">GitHub</a>
+                <a href="https://discord.com/users/855114225445109760" target="_blank">Discord</a>
+            </div>
+        </div> 
+        
+        <div class="right-column">
+            
+            <div class="discord-profile card">
+                <h3>DISCORD ACTIVE DEVELOPER BADGE</h3>
+                <div class="image-wrapper">
+                    <a href="discord://user/855114225445109760" target="_blank">
+                        <img src="images/self.png" alt="My Discord Proflie" class="discord-avatar">
+                    </a>
+                </div>
+            </div>
+
+            <div class="discord-profile card">
+                <h3>MY DISCORD BOT </h3>
+                <div class="image-wrapper">
+                    <a href="discord://user/855114225445109760" target="_blank">
+                        <img src="images/bot.png" alt="My Discord BOT" class="discord-avatar bot-img">
+                    </a>
+                </div>
+            </div>
+            
         </div>
-        <div class="social">
-            <h3>Contact information</h3>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=940104ryan484442903@gmail.com" target="_blank">Gmail</a>
-            <a href="https://github.com/LightYagami8355/Tailwind-v1.1" target="_blank">GitHub</a>
-            <a href="https://discord.com/users/855114225445109760" target="_blank">Discord</a>
-        </div>
+        
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.accordion-header');
+            const content = document.querySelector('.accordion-content');
+
+            // 設置初始狀態：預設展開
+            header.classList.add('active');
+            content.classList.add('open');
+
+            header.addEventListener('click', function() {
+                // 切換標題的 active 狀態 (用於改變 +/- 符號)
+                this.classList.toggle('active');
+
+                // 切換內容的 open 狀態 (用於 CSS 實現滑動效果)
+                content.classList.toggle('open');
+            });
+        });
+    </script>
 </body>
 </html>
